@@ -3,6 +3,8 @@ if (Ti.version < 1.8 ) {
 }
 
 (function() {
+  var conf = require('Config').conf;
+
   function startup(){
 	  var Window;
 	  Window = require('ui/handheld/ApplicationWindow');
@@ -21,7 +23,7 @@ if (Ti.version < 1.8 ) {
   }
 
   //usernameが保存されていなければ初回起動画面を表示
-  if(Ti.App.Properties.hasProperty('username')){
+  if(Ti.App.Properties.hasProperty(conf.username)){
     startup();
   }else{
     init_window();

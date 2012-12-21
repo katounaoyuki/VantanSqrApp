@@ -1,14 +1,12 @@
 function InitWindow(title) {
+
+  var conf = require('Config').conf;
+
 	var self = Ti.UI.createWindow({
 		title:title,
     layout:'vertical',
 		backgroundColor:'white'
 	});
-
-  
-  //var button = Ti.UI.createButton({title:'close', width:Ti.UI.Size, height:Ti.UI.Size});
-  //button.addEventListener('click', function(){self.close();});
-  //self.add(button);
 
   var label = Ti.UI.createLabel({
     top:10,
@@ -31,12 +29,18 @@ function InitWindow(title) {
     var username = e.value;
 
     if(Ti.Network.online){
-      var url = "http://vantan.tidevs.in/users";
+      var url = "http://" + conf.host + "/users";
       var http = Ti.Network.createHTTPClient({timeout:10000});
       http.onload = function(){
         Ti.API.info(http.responseText);
-        Ti.App.Properties.setString('username', username);
-        self.close();
+        var response = http.responseText;
+        if(response == conf.response_ok){
+          Ti.App.Properties.setString(conf.username, username);
+          self.close();
+        }else{
+          //エラー処理
+          alert(response);
+        }
       };
       http.onerror = function(e){alert("エラー！")};
       http.open('POST', url);
