@@ -8,6 +8,13 @@ function InitWindow(title) {
 		backgroundColor:'white'
 	});
 
+  var view = Ti.UI.createScrollView({
+    layout:'vertical',
+    contentWidth: 'auto',
+    contentHeight: 'auto',
+    showVerticalScrollIndicator: true
+  });
+
   var label = Ti.UI.createLabel({
     top:10,
     left:10,
@@ -15,7 +22,7 @@ function InitWindow(title) {
     height:Ti.UI.Size,
     text: "世界最高のパクリアプリ『5Square』をご利用いただきありがとうございます！このアプリを利用するにはユーザー登録が必要です。登録された情報は２ちゃんねるに勝手に書き込んだり第三者に金のために売り渡したりはしません（今のところ）。ユーザー名は半角英数字で４文字以上、１５文字以内で登録してください。"
   });
-  self.add(label);
+  view.add(label);
 
   var textField = Ti.UI.createTextField({
     hintText:'ユーザー名を登録してね（半角英数字）',
@@ -36,7 +43,13 @@ function InitWindow(title) {
         var response = http.responseText;
         if(response == conf.response_ok){
           Ti.App.Properties.setString(conf.username, username);
-          self.close();
+
+          var Tutrial = require('ui/handheld/TutrialWindow');
+          var tutrial = new Tutrial();
+          tutrial.open();
+          tutrial.addEventListener('close', function(){
+            self.close();
+          });
         }else{
           //エラー処理
           alert(response);
@@ -50,7 +63,8 @@ function InitWindow(title) {
     }
   });
 	
-  self.add(textField);
+  view.add(textField);
+  self.add(view);
 	
 	return self;
 };
