@@ -39,7 +39,6 @@ function InitWindow(title) {
       var url = "http://" + conf.host + "/users";
       var http = Ti.Network.createHTTPClient({timeout:10000});
       http.onload = function(){
-        Ti.API.info(http.responseText);
         var response = http.responseText;
         if(response == conf.response_ok){
           Ti.App.Properties.setString(conf.username, username);
