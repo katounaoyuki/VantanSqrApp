@@ -17,8 +17,6 @@ function ApplicationWindow(title) {
 	self.add(button);
 	
 	button.addEventListener('click', function() {
-		//containingTab attribute must be set by parent tab group on
-		//the window for this work
 		self.containingTab.open(Ti.UI.createWindow({
 			title: L('newWindow'),
 			backgroundColor: 'white'
@@ -26,14 +24,19 @@ function ApplicationWindow(title) {
 	});
 
   var data = [];
-  //data.push({title:'東京都練馬区谷原0-0-0', user:{username:'yagi1'}});
-  //data.push({title:'東京都練馬区谷原1-1-1', user:{username:'yagi2'}});
-  //data.push({title:'東京都練馬区谷原2-2-2', user:{username:'yagi3'}});
   var table = Ti.UI.createTableView({
     top:10
   });
   table.setData(data);
   self.add(table);
+
+  table.addEventListener('click', function(e){
+    var place = e.rowData.place;
+    var Window = require('ui/handheld/Map');
+    var window = new Window(place);
+    self.containingTab.open(window);
+  });
+
 
   var url = "http://" + conf.host + "/places.json";
   var http = Ti.Network.createHTTPClient({timeout:10000});
@@ -43,7 +46,7 @@ function ApplicationWindow(title) {
     var len = response.length;
     var data = [];
     for(var i = 0; i < len; i++){
-        data.push({title:response[i].address, user:response[i].user});
+        data.push({title:response[i].address, place:response[i]});
     }
     table.setData(data);
   }
