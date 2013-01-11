@@ -17,10 +17,9 @@ function ApplicationWindow(title) {
 	self.add(button);
 	
 	button.addEventListener('click', function() {
-		self.containingTab.open(Ti.UI.createWindow({
-			title: L('newWindow'),
-			backgroundColor: 'white'
-		}));
+    var Window = require('ui/handheld/Place');
+    var window = new Window();
+    self.containingTab.open(window);
 	});
 
   var data = [];
