@@ -3,7 +3,9 @@ function Place(){
     backgroundColor: 'White'
   });
 
-  var wrap = Ti.UI.createView({
+  var wrap = Ti.UI.createScrollView({
+    contentHeight: 'auto',
+    contentWidth: 'auto',
     layout: 'vertical'
   });
 
@@ -41,6 +43,42 @@ function Place(){
         userLocation:true
       });
       wrap.add(map);
+      //コメントを投稿する
+      var textArea = Ti.UI.createTextArea({
+        hintText:'コメントを投稿',
+        top: 5,
+        left: 10,
+        right: 10,
+        height: 80,
+        borderColor: '#bbb',
+        borderRadius: 5,
+        borderWidth: 2,
+        borderStyle: Titanium.UI.INPUT_BORDERSTYLE_ROUNDED
+      });
+      wrap.add(textArea);
+      //写真を投稿するよ
+      var button = Ti.UI.createButton({
+        top: 10,
+        title: '写真を送る',
+        width: Ti.UI.SIZE,
+        height: Ti.UI.SIZE
+      });
+      wrap.add(button);
+      button.addEventListener('click', function(e){
+        var dialog = Ti.UI.createOptionDialog({
+          options: ['カメラで撮影', 'ライブラリから選ぶ', 'キャンセル'],
+          cancel: 2
+        });
+        dialog.show();
+        dialog.addEventListener('click', function(e){
+          if(e.index == 0){
+            //camera
+          }else if(e.index == 1){
+            //ギャラリー
+          }
+        });
+      });
+
     }
   });
 
