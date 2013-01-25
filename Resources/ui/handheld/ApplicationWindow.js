@@ -37,23 +37,27 @@ function ApplicationWindow(title) {
   });
 
 
-  var url = "http://" + conf.host + "/places.json";
-  var http = Ti.Network.createHTTPClient({timeout:10000});
-  function onLoad(){
-    var json_data = http.responseText;
-    var response = JSON.parse(json_data);
-    var len = response.length;
-    var data = [];
-    for(var i = 0; i < len; i++){
-        data.push({title:response[i].address, place:response[i]});
+  function onLoad(e){
+    if(e.success){
+      var response = e.places;
+      var len = response.length;
+      var data = [];
+      for(var i = 0; i < len; i++){
+          data.push({title:response[i].address, place:response[i]});
+      }
+      table.setData(data);
     }
-    table.setData(data);
   }
-  http.onload = onLoad;
-  http.open('GET', url);
-  http.send();
+  var Cloud = require('ti.cloud');
+  var login_params = {
+    login: Ti.App.Properties.getString('username'),
+    password: Ti.App.Properties.getString('password')
+  };
+  Cloud.Users.login(login_params, function(){
+    Cloud.Places.query({}, onLoad);
+  });
 	
 	return self;
-};
+}
 
 module.exports = ApplicationWindow;

@@ -1,5 +1,5 @@
 function Map(place){
-
+  Ti.API.info(JSON.stringify(place));
   var self = Ti.UI.createWindow({
     backgroundColor: 'White',
     title: '地図',
@@ -49,9 +49,9 @@ function Map(place){
     }));
   }
 
-  if(place.image){
+  if(place.photo){
     wrap.add(Ti.UI.createImageView({
-      image: place.image,
+      image: place.photo.urls.original,
       top: 5,
       width: Ti.Platform.displayCaps.platformWidth,
       height: Ti.UI.SIZE

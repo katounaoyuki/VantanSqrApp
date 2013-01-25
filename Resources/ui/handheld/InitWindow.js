@@ -1,5 +1,4 @@
 function InitWindow(title) {
-
   var conf = require('Config').conf;
 
 	var self = Ti.UI.createWindow({
@@ -32,40 +31,97 @@ function InitWindow(title) {
     width: 250, height: 60
   });
 
-  textField.addEventListener('return', function(e){
-    var username = e.value;
+  var password_field = Ti.UI.createTextField({
+    passwordMask: true,
+    hintText:'パスワードを入力してね',
+    borderStyle: Ti.UI.INPUT_BORDERSTYLE_ROUNDED,
+    color: '#336699',
+    top: 10, left: 10,
+    width: 250, height: 60
+  });
 
+  var password_confirmation_field = Ti.UI.createTextField({
+    passwordMask: true,
+    hintText:'確認のためにもう一度パスワードを入力してね',
+    borderStyle: Ti.UI.INPUT_BORDERSTYLE_ROUNDED,
+    color: '#336699',
+    top: 10, left: 10,
+    width: 250, height: 60
+  });
+
+  var submitButton = Ti.UI.createButton({
+    width: Ti.UI.SIZE,
+    height: Ti.UI.SIZE,
+    title: '登録',
+    top: 10
+  });
+  view.add(textField);
+  view.add(password_field);
+  view.add(password_confirmation_field);
+  view.add(submitButton);
+
+  submitButton.addEventListener('click', function(e){
     if(Ti.Network.online){
-      var url = "http://" + conf.host + "/users";
-      var http = Ti.Network.createHTTPClient({timeout:10000});
-      http.onload = function(){
-        var response = http.responseText;
-        if(response == conf.response_ok){
-          Ti.App.Properties.setString(conf.username, username);
-
-          var Tutrial = require('ui/handheld/TutrialWindow');
-          var tutrial = new Tutrial();
-          tutrial.open();
-          tutrial.addEventListener('close', function(){
-            self.close();
-          });
-        }else{
-          //エラー処理
-          alert(response);
-        }
+      var Cloud = require('ti.cloud');
+      Cloud.debug = true;
+      var username = textField.value;
+      var password = password_field.value;
+      var password_confirmation = password_confirmation_field.value;
+      var params = {
+        username: username,
+        password: password,
+        password_confirmation: password_confirmation
       };
-      http.onerror = function(e){alert("エラー！")};
-      http.open('POST', url);
-      http.send({"user[username]":username});
+
+      function validate(p){
+        alert(p);
+        var error_messages = [];
+        if(p.username === ""){
+          error_messages.push("ユーザー名を入れろ");
+        }
+        if(p.password.length < 4){
+          error_messages.push("パスワードが短すぎます（4文字以上でお願いします）");
+        }
+        if(p.password.length > 20){
+          error_messages.push("ええ、安全第一ですけど、いくらなんでもパスワードが長いです");
+        }
+        if(p.password != p.password_confirmation){
+          error_messages.push("パスワードが一致していません");
+        }
+        return error_messages;
+      }
+
+      var error_messages = validate(params);
+
+      if(error_messages.length <= 0){
+        //alert(params);
+        Cloud.Users.create(params, function(e){
+          if(e.success){
+            //登録成功
+            Ti.App.Properties.setString('username', username);
+            Ti.App.Properties.setString('password', password);
+            var Tutrial = require('ui/handheld/TutrialWindow');
+            var tutrial = new Tutrial();
+            tutrial.addEventListener('close', function(){
+              self.close();
+            });
+            tutrial.open();
+          }else{
+            //登録失敗のエラー処理
+            alert(e.message);
+          }
+        });
+      }else{
+        alert(error_messages.join("\n"));
+      }
     }else{
       alert("ごめんね、ネットワークが繋がってないみたい。調べてみて！");
     }
   });
 	
-  view.add(textField);
   self.add(view);
 	
 	return self;
-};
+}
 
 module.exports = InitWindow;
