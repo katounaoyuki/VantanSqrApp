@@ -43,18 +43,20 @@ function ApplicationWindow(title) {
       var len = response.length;
       var data = [];
       for(var i = 0; i < len; i++){
-          data.push({title:response[i].address, place:response[i]});
+          data.push({title:i.toString() + response[i].address, place:response[i]});
       }
       table.setData(data);
     }
   }
-  var Cloud = require('ti.cloud');
-  var login_params = {
-    login: Ti.App.Properties.getString('username'),
-    password: Ti.App.Properties.getString('password')
-  };
-  Cloud.Users.login(login_params, function(){
-    Cloud.Places.query({}, onLoad);
+  self.addEventListener('focus', function(){
+    var Cloud = require('ti.cloud');
+    var login_params = {
+      login: Ti.App.Properties.getString('username'),
+      password: Ti.App.Properties.getString('password')
+    };
+    Cloud.Users.login(login_params, function(){
+      Cloud.Places.query({per_page: 50, order:"-created_at"}, onLoad);
+    });
   });
 	
 	return self;
