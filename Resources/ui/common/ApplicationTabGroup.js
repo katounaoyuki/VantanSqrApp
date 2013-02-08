@@ -3,8 +3,9 @@ function ApplicationTabGroup(Window) {
 	var self = Ti.UI.createTabGroup();
 	
 	//create app tabs
-	var win1 = new Window(L('home')),
-		win2 = new Window(L('settings'));
+	var win1 = new Window(L('home'));
+  var SettingWindow = require('ui/handheld/Setting');
+	var win2 = new SettingWindow(L('settings'));
 	
 	var tab1 = Ti.UI.createTab({
 		title: L('home'),
@@ -24,6 +25,6 @@ function ApplicationTabGroup(Window) {
 	self.addTab(tab2);
 	
 	return self;
-};
+}
 
 module.exports = ApplicationTabGroup;

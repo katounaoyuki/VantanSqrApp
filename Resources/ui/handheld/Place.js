@@ -34,7 +34,7 @@ function Place(){
       longitude = e.coords.longitude;
       function open_map(){ //ReverseGeocorderが成功したら実行
         var result = JSON.parse(http.responseText);
-        address = result.results[0].formatted_address;
+        address = result.results[0].formatted_address.replace(/^[^,]+, /, '');
         var map = Ti.Map.createView({
           top: 0,
           width: Ti.UI.FILL,
@@ -53,7 +53,8 @@ function Place(){
         wrap.add(map);
         //コメントを投稿する
         var textArea = Ti.UI.createTextArea({
-          hintText:'コメントを投稿',
+          //hintText:'コメントを投稿',
+          value: address + "にチャリで来た",
           top: 5,
           left: 10,
           right: 10,
@@ -102,6 +103,22 @@ function Place(){
         });
 
         submit_button.addEventListener('click', function(){
+
+          //Loading画面
+          var loading = Ti.UI.createView({
+            backgroundColor: 'Black',
+            opacity: 0.7,
+            top: 0
+          });
+          self.add(loading);
+          var ind = Ti.UI.createActivityIndicator({
+            color:'White',
+            message: '送信中…',
+            width: Ti.UI.SIZE
+          });
+          loading.add(ind);
+          ind.show();
+
           //ログインしたらPlacesに投稿
           login_params = {
             login: Ti.App.Properties.getString('username'),
@@ -116,10 +133,14 @@ function Place(){
                 user_id: e.id,
                 address: address,
                 latitude: latitude,
-                longitude: longitude,
-                photo: image_to_send
+                longitude: longitude
+//                photo: image_to_send
               };
+              if(image_to_send){
+                place_params.photo = image_to_send;
+              }
               Cloud.Places.create(place_params, function(e){
+                self.remove(loading);
                 if(e.success){
                   self.close();
                 }else{
@@ -127,6 +148,7 @@ function Place(){
                 }
               });
             }else{
+              self.remove(loading);
               alert(e);
             }
           });
