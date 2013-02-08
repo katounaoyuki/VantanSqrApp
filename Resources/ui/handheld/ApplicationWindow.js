@@ -24,10 +24,44 @@ function ApplicationWindow(title) {
 
   var data = [];
   var table = Ti.UI.createTableView({
+    editable: true,
     top:10
   });
   table.setData(data);
   self.add(table);
+
+  var edit_button = Ti.UI.createButton({
+    systemButton: Ti.UI.iPhone.SystemButton.EDIT
+  });
+
+  var cancel_button = Ti.UI.createButton({
+    systemButton: Ti.UI.iPhone.SystemButton.CANCEL
+  });
+
+  self.rightNavButton = edit_button;
+  edit_button.addEventListener('click', function(e){
+    table.editing = true;
+    self.rightNavButton = cancel_button;
+  });
+  cancel_button.addEventListener('click', function(e){
+    table.editing = false;
+    self.rightNavButton = edit_button;
+  });
+
+  table.addEventListener('delete', function(e){
+    var place_id = e.rowData.place.id;
+    var Cloud = require('ti.cloud');
+    Cloud.debug = true;
+    var login_params = {
+      login: Ti.App.Properties.getString('username'),
+      password: Ti.App.Properties.getString('password')
+    };
+    Cloud.Users.login(login_params, function(e){
+      Cloud.Places.remove({place_id: place_id}, function(e){
+        alert(e);
+      });
+    });
+  });
 
   table.addEventListener('click', function(e){
     var place = e.rowData.place;
@@ -43,7 +77,7 @@ function ApplicationWindow(title) {
       var len = response.length;
       var data = [];
       for(var i = 0; i < len; i++){
-          data.push({title:i.toString() + response[i].address, place:response[i]});
+          data.push({title:response[i].address, place:response[i]});
       }
       table.setData(data);
     }
