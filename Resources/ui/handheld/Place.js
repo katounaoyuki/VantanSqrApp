@@ -134,7 +134,6 @@ function Place(){
                 address: address,
                 latitude: latitude,
                 longitude: longitude
-//                photo: image_to_send
               };
               if(image_to_send){
                 place_params.photo = image_to_send;
