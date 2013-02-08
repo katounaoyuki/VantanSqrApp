@@ -4,9 +4,12 @@ function ApplicationWindow(title) {
 
 	var self = Ti.UI.createWindow({
 		title:title,
-    layout:'vertical',
 		backgroundColor:'white'
 	});
+
+  var wrap = Ti.UI.createView({
+    layout: 'vertical'
+  });
 	
 	var button = Ti.UI.createButton({
 		height:44,
@@ -14,7 +17,7 @@ function ApplicationWindow(title) {
 		title:L('openWindow'),
 		top:20
 	});
-	self.add(button);
+	wrap.add(button);
 	
 	button.addEventListener('click', function() {
     var Window = require('ui/handheld/Place');
@@ -28,7 +31,7 @@ function ApplicationWindow(title) {
     top:10
   });
   table.setData(data);
-  self.add(table);
+  wrap.add(table);
 
   var edit_button = Ti.UI.createButton({
     systemButton: Ti.UI.iPhone.SystemButton.EDIT
@@ -49,6 +52,15 @@ function ApplicationWindow(title) {
   });
 
   table.addEventListener('delete', function(e){
+    var loading = Ti.UI.createView({
+      backgroundColor: 'Black',
+      opacity: 0.7, top:0, width: Ti.UI.FILL, height: Ti.UI.FILL
+    });
+    var ind = Ti.UI.createActivityIndicator({message:'削除中', color:'White',width:Ti.UI.SIZE});
+    loading.add(ind);
+    ind.show();
+    self.add(loading);
+
     var place_id = e.rowData.place.id;
     var Cloud = require('ti.cloud');
     Cloud.debug = true;
@@ -57,9 +69,13 @@ function ApplicationWindow(title) {
       password: Ti.App.Properties.getString('password')
     };
     Cloud.Users.login(login_params, function(e){
-      Cloud.Places.remove({place_id: place_id}, function(e){
-        alert(e);
-      });
+      if(e.success){
+        Cloud.Places.remove({place_id: place_id}, function(e){
+          self.remove(loading);
+        });
+      }else{
+        self.remove(loading);
+      }
     });
   });
 
@@ -93,6 +109,7 @@ function ApplicationWindow(title) {
     });
   });
 	
+  self.add(wrap);
 	return self;
 }
 
